@@ -1,0 +1,75 @@
+#include <Wire.h>  // Include Wire if you're using I2C
+#include <SFE_MicroOLED.h>  // Include the SFE_MicroOLED library
+#include "bitmaps.h"
+#include "SparkFun_Qwiic_Twist_Arduino_Library.h" 
+TWIST twist;
+
+//////////////////////////
+// MicroOLED Definition //
+//////////////////////////
+//The library assumes a reset pin is necessary. The Qwiic OLED has RST hard-wired, so pick an arbitrarty IO pin that is not being used
+#define PIN_RESET 9  
+//The DC_JUMPER is the I2C Address Select jumper. Set to 1 if the jumper is open (Default), or set to 0 if it's closed.
+#define DC_JUMPER 1
+
+//////////////////////////////////
+// MicroOLED Object Declaration //
+//////////////////////////////////
+MicroOLED oled(PIN_RESET, DC_JUMPER);    // I2C declaration
+
+void setup()
+{
+  delay(100);
+  oled.begin();    // Initialize the OLED
+  oled.clear(ALL); // Clear the display's internal memory
+  oled.display();  // Display what's in the buffer (splashscreen)
+  delay(1000);     // Delay 1000 ms
+  oled.clear(PAGE); // Clear the buffer.
+
+Serial.begin(9600);
+  Serial.println("Qwiic Twist Example");
+
+  if(twist.begin() == false)
+  {
+    Serial.println("Twist does not appear to be connected. Please check wiring. Freezing...");
+    while(1);
+  }
+
+
+  
+}
+//---------------------------------------------------------------
+void loop()
+{
+
+Serial.print("Count: ");
+
+  if(twist.isPressed() == true){
+
+  
+    drawRick();
+    delay(500);
+    drawMorty();
+    delay(500);
+  }
+
+ 
+
+}
+//---------------------------------------------------------------
+void drawRick()
+{
+    oled.clear(ALL);
+    oled.clear(PAGE);
+    oled.drawBitmap(rick);//Display Logo
+    oled.display();
+}
+//---------------------------------------------------------------
+
+void drawMorty()
+{
+    oled.clear(ALL);
+    oled.clear(PAGE);
+    oled.drawBitmap(morty);//Display Logo
+    oled.display();
+}
