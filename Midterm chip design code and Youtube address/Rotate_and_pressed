@@ -1,0 +1,79 @@
+#include <Wire.h>  // Include Wire if you're using I2C
+#include <SFE_MicroOLED.h>  // Include the SFE_MicroOLED library
+#include "SparkFun_Qwiic_Twist_Arduino_Library.h" //Click here to get the library: http://librarymanager/All#SparkFun_Twist
+TWIST twist; //Create instance of this object
+
+
+//The library assumes a reset pin is necessary. The Qwiic OLED has RST hard-wired, so pick an arbitrarty IO pin that is not being used
+#define PIN_RESET 9  
+//The DC_JUMPER is the I2C Address Select jumper. Set to 1 if the jumper is open (Default), or set to 0 if it's closed.
+#define DC_JUMPER 1 
+
+
+MicroOLED oled(PIN_RESET, DC_JUMPER);    // I2C declaration
+
+const byte twistInterruptPin = 4; //Can be any GPIO
+
+void setup()
+{
+  delay(100);
+  oled.begin();    // Initialize the OLED
+  oled.clear(ALL); // Clear the display's internal memory
+  oled.display();  // Display what's in the buffer (splashscreen)
+  delay(1000);     // Delay 1000 ms
+  oled.clear(PAGE); // Clear the buffer.
+  
+  randomSeed(analogRead(A0) + analogRead(A1));
+
+   Serial.begin(9600);
+  Serial.println("Qwiic Twist Example");
+
+  pinMode(twistInterruptPin, INPUT_PULLUP);
+
+  if (twist.begin() == false)
+  {
+    Serial.println("Twist does not appear to be connected. Please check wiring. Freezing...");
+    while (1);
+  }
+}
+
+void lineExample()
+{
+
+  printTitle("Lines!", 1);
+  
+}
+
+
+void loop()
+{
+
+
+    if(twist.isMoved())
+    {
+      printTitle("Rotate", 1);
+    }
+
+    if(twist.isPressed())
+    {
+ printTitle("Pressed", 1);
+    }
+
+}
+
+void printTitle(String title, int font)
+{
+  int middleX = oled.getLCDWidth() / 2;
+  int middleY = oled.getLCDHeight() / 2;
+  
+  oled.clear(PAGE);
+  oled.setFontType(font);
+  // Try to set the cursor in the middle of the screen
+  oled.setCursor(middleX - (oled.getFontWidth() * (title.length()/2)),
+                 middleY - (oled.getFontWidth() / 2));
+  // Print the title:
+  oled.print(title);
+  oled.display();
+  delay(1500);
+  oled.clear(PAGE);
+}
